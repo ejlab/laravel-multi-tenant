@@ -1,0 +1,11 @@
+{
+    "name": "ejlab/multitenant",
+    "description": "Multi tenant",
+    "authors": [
+        {
+            "name": "Eunjun Park",
+            "email": "ej@ej-lab.com"
+        }
+    ],
+    "require": {}
+}
