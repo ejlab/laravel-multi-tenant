@@ -5,6 +5,7 @@ namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Symfony\Component\Console\Input\InputOption;
 use App\Tenant;
+use EJLab\Laravel\MultiTenant\DatabaseManager;
 
 class MigrateInstallCommand extends InstallCommand
 {
@@ -23,9 +24,11 @@ class MigrateInstallCommand extends InstallCommand
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
 
+            $manager = new DatabaseManager();
+
             foreach ($tenants as $tenant) {
-                // todo: set connection
-                $this->repository->setSource('tenant');
+                $manager->setConnection($tenant);
+                $this->repository->setSource($manager->tenantConnectionName);
                 $this->repository->createRepository();
                 $this->info("Migration table for {$tenant->name} created successfully.");
             }

@@ -17,16 +17,17 @@ class DatabaseManager
 
     public function __construct(Tenant $tenant = NULL)
     {
-        $this->systemConnectionName = Config('elmt.system-connection-name', 'elmt');
-        $this->tenantConnectionName = Config('elmt.tenant-connection-name', 'tenant');
-        $this->tenantAdminConnectionName = Config('elmt.tenant-admin-connection-name', 'tenant_admin');
+        $this->tenantConnectionName = Config('elmt.tenant-connection', 'tenant');
+        $this->systemConnectionName = Config('elmt.system-connection', 'elmt');
+        $this->tenantAdminConnectionName = Config('elmt.tenant-admin-connection', 'tenant_admin');
         if (!is_null($tenant)) $this->setConnection($tenant);
     }
 
     public function setConnection(Tenant $tenant)
     {
         if (!is_null($tenant)) $this->tenant = $tenant;
-
+        DB::purge($this->tenantAdminConnectionName);
+        DB::purge($this->tenantConnectionName);
         Config::set('database.connections.'.$this->tenantAdminConnectionName, $this->getTenantAdminConfig());
         Config::set('database.connections.'.$this->tenantConnectionName, $this->getTenantConfig());
     }
