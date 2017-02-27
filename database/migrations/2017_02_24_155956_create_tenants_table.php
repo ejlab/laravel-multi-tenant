@@ -17,6 +17,8 @@ class CreateTenantsTable extends Migration
             $table->increments('id');
             $table->string('domain')->unique();
             $table->string('name');
+            $table->ipAddress('db_host');
+            $table->unsignedSmallInteger('db_port')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
