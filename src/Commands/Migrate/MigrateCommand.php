@@ -56,7 +56,7 @@ class MigrateCommand extends BaseMigrateCommand
             foreach ($tenants as $tenant) {
                 
                 $manager->setConnection($tenant);
-                $this->migrator->setConnection('tenant');
+                $this->migrator->setConnection($manager->tenantConnectionName);
 
                 if (! $this->migrator->repositoryExists()) {
                     $this->call('migrate:install', ['--tenant' => TRUE, '--domain' => $tenant->domain]);
