@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateInstallCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateMakeCommand;
+use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateRollbackCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateStatusCommand;
 
 class MultiTenantServiceProvider extends ServiceProvider
@@ -46,6 +47,10 @@ class MultiTenantServiceProvider extends ServiceProvider
         
         $this->app->extend('command.migrate.make', function ($object, $app) {
             return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
+        });
+
+        $this->app->extend('command.migrate.rollback', function ($object, $app) {
+            return new MigrateRollbackCommand($app['migrator']);
         });
 
         $this->app->extend('command.migrate.status', function ($object, $app) {
