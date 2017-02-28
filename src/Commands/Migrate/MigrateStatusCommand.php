@@ -73,7 +73,7 @@ class MigrateStatusCommand extends StatusCommand
     protected function getOptions()
     {
         return array_merge(parent::getOptions(), [
-            ['tenant', 'T', InputOption::VALUE_NONE, "Create the migration repository for tenant database. '--database' option will be ignored. use '--domain' instead."],
+            ['tenant', 'T', InputOption::VALUE_NONE, "Show the status of each migration for tenant database. '--database' option will be ignored. use '--domain' instead."],
             ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
         ]);
     }
