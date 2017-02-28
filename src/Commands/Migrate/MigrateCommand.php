@@ -2,8 +2,10 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use Illuminate\Database\Console\Migrations\MigrateCommand as BaseMigrateCommand;
 use App\Tenant;
+use EJLab\Laravel\MultiTenant\DatabaseManager;
+use DB;
+use Illuminate\Database\Console\Migrations\MigrateCommand as BaseMigrateCommand;
 
 class MigrateCommand extends BaseMigrateCommand
 {
@@ -21,17 +23,6 @@ class MigrateCommand extends BaseMigrateCommand
                 {--T|tenant : Run migrations for tenant. '--database' option will be ignored. use '--domain' instead.}
                 {--domain= : The domain for tenant. 'all' or null value for all tenants.}";
     
-    // public function handle()
-    // {
-    //     $this->info('Migration start');
-    //     $tenants = Tenant::all();
-    //     foreach ($tenants as $tenant) {
-    //         $this->call('migrate', ['--database'=>'tenant', '--path'=>'database/migrations/tenant']);
-    //         $this->info("{$tenant->name} migrated.");
-    //     }
-    //     $this->info('Migration done');
-    // }
-    
     /**
      * Execute the console command.
      *
@@ -46,10 +37,16 @@ class MigrateCommand extends BaseMigrateCommand
         if ($this->input->getOption('tenant')) {
 
             $domain = $this->input->getOption('domain') ?: 'all';
+
+            $manager = new DatabaseManager();
+            DB::setDefaultConnection($manager->systemConnectionName);
             
-            $tenants = NULL;
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
+
+            $drawBar = (count($tenants) > 1);
+
+            if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
 
             $paths = [];
             foreach ($this->getMigrationPaths() as $path) {
@@ -58,12 +55,12 @@ class MigrateCommand extends BaseMigrateCommand
 
             foreach ($tenants as $tenant) {
                 
-                // todo: set connection
-
+                $manager->setConnection($tenant);
                 $this->migrator->setConnection('tenant');
 
                 if (! $this->migrator->repositoryExists()) {
                     $this->call('migrate:install', ['--tenant' => TRUE, '--domain' => $tenant->domain]);
+                    DB::setDefaultConnection($manager->tenantConnectionName);
                 }
 
                 // Next, we will check to see if a path option has been defined. If it has
@@ -87,8 +84,12 @@ class MigrateCommand extends BaseMigrateCommand
                 if ($this->option('seed')) {
                     $this->call('db:seed', ['--force' => true]);
                 }
+
+                if ($drawBar) $bar->advance();
+                $this->info(($drawBar?'  ':'')."'{$tenant->name}' migrated.");
             }
 
+            if ($drawBar) $bar->finish();
 
         } else parent::fire();
 
