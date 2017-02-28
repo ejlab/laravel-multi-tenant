@@ -58,6 +58,9 @@ class MigrateCommand extends BaseMigrateCommand
                 $manager->setConnection($tenant);
                 $this->migrator->setConnection($manager->tenantConnectionName);
 
+                $this->info('');
+                $this->info("Migrating for '{$tenant->name}'...");
+
                 if (! $this->migrator->repositoryExists()) {
                     $this->call('migrate:install', ['--tenant' => TRUE, '--domain' => $tenant->domain]);
                     DB::setDefaultConnection($manager->tenantConnectionName);
