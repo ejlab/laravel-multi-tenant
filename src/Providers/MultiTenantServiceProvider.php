@@ -7,9 +7,12 @@ use Illuminate\Support\ServiceProvider;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateInstallCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateMakeCommand;
+use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateRefreshCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateResetCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateRollbackCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateStatusCommand;
+use EJLab\Laravel\MultiTenant\Commands\Seeds\SeedCommand;
+use EJLab\Laravel\MultiTenant\Commands\Seeds\SeederMakeCommand;
 
 class MultiTenantServiceProvider extends ServiceProvider
 {
@@ -50,6 +53,10 @@ class MultiTenantServiceProvider extends ServiceProvider
             return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
         });
 
+        $this->app->extend('command.migrate.refresh', function ($object, $app) {
+            return new MigrateRefreshCommand;
+        });
+
         $this->app->extend('command.migrate.reset', function ($object, $app) {
             return new MigrateResetCommand($app['migrator']);
         });
@@ -60,6 +67,14 @@ class MultiTenantServiceProvider extends ServiceProvider
 
         $this->app->extend('command.migrate.status', function ($object, $app) {
             return new MigrateStatusCommand($app['migrator']);
+        });
+
+        $this->app->extend('command.seed', function ($object, $app) {
+            return new SeedCommand($app['db']);
+        });
+
+        $this->app->extend('command.seeder.make', function ($object, $app) {
+            return new SeederMakeCommand($app['files'], $app['composer']);
         });
     }
 }
