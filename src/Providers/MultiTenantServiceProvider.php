@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use EJLab\Laravel\MultiTenant\Commands\TenantSetupCommand;
 use EJLab\Laravel\MultiTenant\Commands\TenantDestroyCommand;
+use EJLab\Laravel\MultiTenant\Commands\ModelMakeCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateInstallCommand;
 use EJLab\Laravel\MultiTenant\Commands\Migrate\MigrateMakeCommand;
@@ -78,6 +79,10 @@ class MultiTenantServiceProvider extends ServiceProvider
 
         $this->app->extend('command.seeder.make', function ($object, $app) {
             return new SeederMakeCommand($app['files'], $app['composer']);
+        });
+
+        $this->app->extend('command.model.make', function ($object, $app) {
+            return new ModelMakeCommand($app['files']);
         });
     }
 }
