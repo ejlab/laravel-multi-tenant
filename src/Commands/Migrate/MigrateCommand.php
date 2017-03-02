@@ -30,11 +30,11 @@ class MigrateCommand extends BaseMigrateCommand
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
-            return;
-        }
-
         if ($this->input->getOption('tenant')) {
+            
+            if (! $this->confirmToProceed()) {
+                return;
+            }
 
             $domain = $this->input->getOption('domain') ?: 'all';
 

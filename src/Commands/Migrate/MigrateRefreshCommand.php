@@ -19,11 +19,11 @@ class MigrateRefreshCommand extends RefreshCommand
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
-            return;
-        }
-
         if ($this->input->getOption('tenant')) {
+
+            if (! $this->confirmToProceed()) {
+                return;
+            }
 
             $domain = $this->input->getOption('domain') ?: 'all';
 
@@ -83,7 +83,7 @@ class MigrateRefreshCommand extends RefreshCommand
             }
 
             if ($drawBar) $bar->finish();
-        }
+        } else parent::fire();
 
     }
 

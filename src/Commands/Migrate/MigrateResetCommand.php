@@ -19,11 +19,11 @@ class MigrateResetCommand extends ResetCommand
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
-            return;
-        }
-
         if ($this->input->getOption('tenant')) {
+            
+            if (! $this->confirmToProceed()) {
+                return;
+            }
 
             $domain = $this->input->getOption('domain') ?: 'all';
 
@@ -66,7 +66,7 @@ class MigrateResetCommand extends ResetCommand
                 $this->info(($drawBar?'  ':'')."'{$tenant->name}' reseted.");
             }
             if ($drawBar) $bar->finish();
-        }
+        } else parent::fire();
     }
 
     /**

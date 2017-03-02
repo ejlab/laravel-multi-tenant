@@ -19,11 +19,11 @@ class MigrateRollbackCommand extends RollbackCommand
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
-            return;
-        }
-
         if ($this->input->getOption('tenant')) {
+
+            if (! $this->confirmToProceed()) {
+                return;
+            }
 
             $domain = $this->input->getOption('domain') ?: 'all';
 
@@ -71,7 +71,7 @@ class MigrateRollbackCommand extends RollbackCommand
                 $this->info(($drawBar?'  ':'')."Rollback for '{$tenant->name}' succeed.");
             }
             if ($drawBar) $bar->finish();
-        }
+        } else parent::fire();
     }
 
     /**
