@@ -3,6 +3,7 @@
 namespace EJLab\Laravel\MultiTenant\Middleware;
 
 use Closure;
+use Config;
 use App\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 
@@ -24,6 +25,8 @@ class HandleTenantConnection
                 $manager = new DatabaseManager();
                 $manager->setConnection($tenant);
 
+                if (Config::get('elmt.remove_domain_parameter', true)) $request->route()->forgetParameter('domain');
+                
                 return $next($request);
             }
         }
