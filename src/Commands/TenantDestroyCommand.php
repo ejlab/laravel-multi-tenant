@@ -40,7 +40,7 @@ class TenantDestroyCommand extends Command
     public function handle()
     {
         $domain = $this->input->getOption('domain') ?: 'all';
-        if ($domain == 'all') $tenants = Tenant::all();
+        if ($domain == 'all') $tenants = Tenant::where('setup_has_done', TRUE)->get();
         else $tenants = Tenant::where('domain', $domain)->get();
 
         $drawBar = (count($tenants) > 1);
@@ -55,6 +55,9 @@ class TenantDestroyCommand extends Command
 
             $manager->setConnection($tenant);
             $manager->delete();
+
+            $tenant->setup_has_done = FALSE;
+            $tenant->save();
 
             if ($drawBar) $bar->advance();
             $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->name}' deleted successfully.");

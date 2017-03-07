@@ -41,7 +41,7 @@ class TenantSetupCommand extends Command
     public function handle()
     {
         $domain = $this->input->getOption('domain') ?: 'all';
-        if ($domain == 'all') $tenants = Tenant::all();
+        if ($domain == 'all') $tenants = Tenant::where('setup_has_done', FALSE)->get();
         else $tenants = Tenant::where('domain', $domain)->get();
 
         $drawBar = (count($tenants) > 1);
@@ -63,6 +63,9 @@ class TenantSetupCommand extends Command
                     '--domain' => $tenant->domain
                 ]);
             }
+
+            $tenant->setup_has_done = TRUE;
+            $tenant->save();
 
             if ($drawBar) $bar->advance();
             $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->name}' created successfully.");
