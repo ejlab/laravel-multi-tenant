@@ -20,7 +20,6 @@ class MigrateRefreshCommand extends RefreshCommand
     public function fire()
     {
         if ($this->input->getOption('tenant')) {
-
             if (! $this->confirmToProceed()) {
                 return;
             }
@@ -59,9 +58,9 @@ class MigrateRefreshCommand extends RefreshCommand
                 $step = $this->input->getOption('step') ?: 0;
 
                 if ($step > 0) {
-                    $this->runRollback($domain, $path, $step, $force);
+                    $this->runRollback($domain, $path, $step, $force, TRUE);
                 } else {
-                    $this->runReset($domain, $path, $force);
+                    $this->runReset($domain, $path, $force, TRUE);
                 }
 
                 // The refresh command is essentially just a brief aggregate of a few other of
@@ -75,7 +74,7 @@ class MigrateRefreshCommand extends RefreshCommand
                 ]);
 
                 if ($this->needsSeeding()) {
-                    $this->runSeeder($domain);
+                    $this->runSeeder($domain, TRUE);
                 }
 
                 if ($drawBar) $bar->advance();
@@ -96,15 +95,16 @@ class MigrateRefreshCommand extends RefreshCommand
      * @param  bool  $force
      * @return void
      */
-    protected function runRollback($domain, $path, $step, $force)
+    protected function runRollback($domain, $path, $step, $force, $tenant = FALSE)
     {
-        $this->call('migrate:rollback', [
+        if ($tenant) $this->call('migrate:rollback', [
             '--tenant' => TRUE,
             '--domain' => $domain,
             '--path' => $path,
             '--step' => $step,
             '--force' => $force,
         ]);
+        else parent::runRollback($domain, $path, $step, $force);
     }
 
     /**
@@ -115,14 +115,15 @@ class MigrateRefreshCommand extends RefreshCommand
      * @param  bool  $force
      * @return void
      */
-    protected function runReset($domain, $path, $force)
+    protected function runReset($domain, $path, $force, $tenant = FALSE)
     {
-        $this->call('migrate:reset', [
+        if ($tenant) $this->call('migrate:reset', [
             '--tenant' => TRUE,
             '--domain' => $domain,
             '--path' => $path,
             '--force' => $force,
         ]);
+        else parent::runReset($domain, $path, $force);
     }
 
     /**
@@ -131,14 +132,15 @@ class MigrateRefreshCommand extends RefreshCommand
      * @param  string  $domain
      * @return void
      */
-    protected function runSeeder($domain)
+    protected function runSeeder($domain, $tenant = FALSE)
     {
-        $this->call('db:seed', [
+        if ($tenant) $this->call('db:seed', [
             '--tenant' => TRUE,
             '--domain' => $domain,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
             '--force' => $this->option('force'),
         ]);
+        else parent::runSeeder($domain);
     }
 
     /**
