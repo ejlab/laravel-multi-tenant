@@ -1,6 +1,7 @@
 {
-    "name": "ejlab/multitenant",
-    "description": "Multi tenant",
+    "name": "ejlab/laravel-multi-tenant",
+    "version" : "0.1.0",
+    "description": "Multi tenant package for Laravel Framework",
     "authors": [
         {
             "name": "Eunjun Park",
