@@ -4,7 +4,7 @@ namespace EJLab\Laravel\MultiTenant\Middleware;
 
 use Closure;
 
-class RemoveDomainParameterInRequest
+class SaveDomainParameterInRequest
 {
     /**
      * Handle an incoming request.
