@@ -2,7 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Tenant;
+use App\Models\System\Tenant;
 use DB;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Database\Console\Migrations\InstallCommand;
@@ -17,13 +17,12 @@ class MigrateInstallCommand extends InstallCommand
      */
     public function fire()
     {
+        $manager = new DatabaseManager();
+        DB::setDefaultConnection($manager->systemConnectionName);
+        
         if ($this->input->getOption('tenant')) {
 
             $domain = $this->input->getOption('domain') ?: 'all';
-            
-            $manager = new DatabaseManager();
-            DB::setDefaultConnection($manager->systemConnectionName);
-            
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
 
@@ -36,19 +35,22 @@ class MigrateInstallCommand extends InstallCommand
                 $this->repository->setSource($manager->tenantConnectionName);
                 $this->repository->createRepository();
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Migration for '{$tenant->name}' created successfully.");
+                $this->info(($drawBar?'  ':'')."Migration for '{$tenant->name}' database created successfully.");
             }
 
             if ($drawBar) $bar->finish();
 
-        } else parent::fire();
+        } else {
+            $this->repository->createRepository();
+            $this->info('Migration table for system database created successfully.');
+        }
     }
 
     protected function getOptions()
     {
-        return array_merge(parent::getOptions(), [
-            ['tenant', 'T', InputOption::VALUE_NONE, "Create the migration repository for tenant database. '--database' option will be ignored. use '--domain' instead."],
+        return [
+            ['tenant', 'T', InputOption::VALUE_NONE, "Create the migration repository for tenant database."],
             ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
-        ]);
+        ];
     }
 }

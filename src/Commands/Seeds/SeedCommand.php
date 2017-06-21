@@ -18,17 +18,14 @@ class SeedCommand extends BaseCommand
      */
     public function fire()
     {
-        if (! $this->confirmToProceed()) {
-            return;
-        }
+        if (! $this->confirmToProceed()) return;
+
+        $manager = new DatabaseManager();
+        DB::setDefaultConnection($manager->systemConnectionName);
 
         if ($this->input->getOption('tenant')) {
 
             $domain = $this->input->getOption('domain') ?: 'all';
-
-            $manager = new DatabaseManager();
-            DB::setDefaultConnection($manager->systemConnectionName);
-            
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
 
@@ -52,6 +49,15 @@ class SeedCommand extends BaseCommand
                 $this->info(($drawBar?'  ':'')."Seed '{$tenant->name}' succeed.");
             }
             if ($drawBar) $bar->finish();
+
+        } else {
+
+            $this->resolver->setDefaultConnection($manager->systemConnectionName);
+
+            Model::unguarded(function () {
+                $this->getSeeder()->__invoke();
+            });
+
         }
     }
 
@@ -75,7 +81,7 @@ class SeedCommand extends BaseCommand
     protected function getOptions()
     {
         return array_merge(parent::getOptions(), [
-            ['tenant', 'T', InputOption::VALUE_NONE, "Seed the database with records for tenant database. '--database' option will be ignored. use '--domain' instead."],
+            ['tenant', 'T', InputOption::VALUE_NONE, "Seed the database with records for tenant database."],
             ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
         ]);
     }

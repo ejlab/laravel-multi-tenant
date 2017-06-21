@@ -4,7 +4,7 @@ namespace EJLab\Laravel\MultiTenant;
 
 use Config;
 use DB;
-use App\Tenant;
+use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\Exceptions\TenantDatabaseException;
 
 class DatabaseManager 
@@ -17,8 +17,8 @@ class DatabaseManager
 
     public function __construct(Tenant $tenant = NULL)
     {
+        $this->systemConnectionName = Config('elmt.system-connection', 'system');
         $this->tenantConnectionName = Config('elmt.tenant-connection', 'tenant');
-        $this->systemConnectionName = Config('elmt.system-connection', 'elmt');
         $this->tenantAdminConnectionName = Config('elmt.tenant-admin-connection', 'tenant_admin');
         if (!is_null($tenant)) $this->setConnection($tenant);
     }

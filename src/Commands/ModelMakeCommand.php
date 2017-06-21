@@ -25,6 +25,7 @@ class ModelMakeCommand extends BaseCommand
         ];
 
         if ($this->input->getOption('tenant')) $args['--tenant'] = TRUE;
+        if ($this->input->getOption('system')) $args['--system'] = TRUE;
 
         $this->call('make:migration', $args);
     }
@@ -36,7 +37,7 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function getStub()
     {
-        if ($this->input->getOption('tenant')) return __DIR__.'/stubs/model.stub';
+        if ($this->input->getOption('tenant') || $this->input->getOption('system')) return __DIR__.'/stubs/model.stub';
         else return parent::getStub();
     }
 
@@ -48,6 +49,7 @@ class ModelMakeCommand extends BaseCommand
     protected function getOptions()
     {
         return array_merge(parent::getOptions(), [
+            ['system', 'S', InputOption::VALUE_NONE, "Create a new Eloquent model class for system database."],
             ['tenant', 'T', InputOption::VALUE_NONE, "Create a new Eloquent model class for tenant database."],
         ]);
     }
@@ -60,10 +62,15 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function buildClass($name)
     {
-        if (!$this->input->getOption('tenant')) return parent::buildClass($name);
+        if (!$this->input->getOption('tenant') && !$this->input->getOption('system')) return parent::buildClass($name);
 
         $stub = $this->files->get($this->getStub());
-        return $this->replaceConnection($stub, Config::get('elmt.tenant-connection', 'tenant2'))->replaceNamespace($stub, $name)->replaceClass($stub, $name);
+        
+        $connection = '';
+        if ($this->input->getOption('system')) $connection = Config::get('elmt.system-connection', 'system');
+        if ($this->input->getOption('tenant')) $connection = Config::get('elmt.tenant-connection', 'tenant');
+
+        return $this->replaceConnection($stub, $connection)->replaceNamespace($stub, $name)->replaceClass($stub, $name);
     }
 
     protected function replaceConnection(&$stub, $connection)

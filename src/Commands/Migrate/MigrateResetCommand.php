@@ -2,7 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Tenant;
+use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use DB;
 use Illuminate\Console\ConfirmableTrait;
@@ -19,22 +19,22 @@ class MigrateResetCommand extends ResetCommand
      */
     public function fire()
     {
+        if (! $this->confirmToProceed()) return;
+
+        $manager = new DatabaseManager();
+        DB::setDefaultConnection($manager->systemConnectionName);
+
+        $paths = $this->getMigrationPaths();
+
         if ($this->input->getOption('tenant')) {
-            
-            if (! $this->confirmToProceed()) {
-                return;
-            }
 
             $domain = $this->input->getOption('domain') ?: 'all';
-
-            $manager = new DatabaseManager();
-            DB::setDefaultConnection($manager->systemConnectionName);
-            
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
 
-            $drawBar = (count($tenants) > 1);
+            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'tenant';
 
+            $drawBar = (count($tenants) > 1);
             if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
 
             foreach ($tenants as $tenant) {
@@ -51,9 +51,7 @@ class MigrateResetCommand extends ResetCommand
                     continue;
                 }
 
-                $this->migrator->reset(array_map(function ($path) {
-                    return $path .= DIRECTORY_SEPARATOR.'tenant';
-                }, $this->getMigrationPaths()), $this->option('pretend'));
+                $this->migrator->reset($paths, $this->option('pretend'));
 
                 // Once the migrator has run we will grab the note output and send it out to
                 // the console screen, since the migrator itself functions without having
@@ -66,7 +64,27 @@ class MigrateResetCommand extends ResetCommand
                 $this->info(($drawBar?'  ':'')."'{$tenant->name}' reseted.");
             }
             if ($drawBar) $bar->finish();
-        } else parent::fire();
+        } else {
+            $this->migrator->setConnection($manager->systemConnectionName);
+
+            // First, we'll make sure that the migration table actually exists before we
+            // start trying to rollback and re-run all of the migrations. If it's not
+            // present we'll just bail out with an info message for the developers.
+            if (! $this->migrator->repositoryExists()) {
+                return $this->comment('Migration table not found.');
+            }
+
+            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'system';
+
+            $this->migrator->reset($paths, $this->option('pretend'));
+
+            // Once the migrator has run we will grab the note output and send it out to
+            // the console screen, since the migrator itself functions without having
+            // any instances of the OutputInterface contract passed into the class.
+            foreach ($this->migrator->getNotes() as $note) {
+                $this->output->writeln($note);
+            }
+        }
     }
 
     /**
@@ -76,9 +94,11 @@ class MigrateResetCommand extends ResetCommand
      */
     protected function getOptions()
     {
-        return array_merge(parent::getOptions(), [
-            ['tenant', 'T', InputOption::VALUE_NONE, "Rollback all database migrations for tenant database. '--database' option will be ignored. use '--domain' instead."],
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
+            ['tenant', 'T', InputOption::VALUE_NONE, "Rollback all database migrations for tenant database."],
             ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
-        ]);
+        ];
     }
 }

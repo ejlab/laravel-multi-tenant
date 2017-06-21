@@ -2,7 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands;
 
-use App\Tenant;
+use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Console\Command;
 

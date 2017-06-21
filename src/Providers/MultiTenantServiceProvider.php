@@ -29,7 +29,7 @@ class MultiTenantServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/elmt.php' => config_path('elmt.php'),
             __DIR__.'/../../database/migrations/' => database_path('migrations'),
-            __DIR__.'/../../database/Tenant.php' => app_path('Tenant.php'),
+            __DIR__.'/../../database/Tenant.php' => app_path('Models/System/Tenant.php'),
         ]);
     }
 

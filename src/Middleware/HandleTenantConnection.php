@@ -3,7 +3,7 @@
 namespace EJLab\Laravel\MultiTenant\Middleware;
 
 use Closure;
-use App\Tenant;
+use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 
 class HandleTenantConnection

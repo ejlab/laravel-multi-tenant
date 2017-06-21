@@ -2,7 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Tenant;
+use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\Migrator;
@@ -18,11 +18,11 @@ class MigrateStatusCommand extends StatusCommand
      */
     public function fire()
     {
+        $manager = new DatabaseManager();
+
         if ($this->input->getOption('tenant')) {
 
             $domain = $this->input->getOption('domain') ?: 'all';
-            $manager = new DatabaseManager();
-
             if ($domain == 'all') $tenants = Tenant::all();
             else $tenants = Tenant::where('domain', $domain)->get();
 
@@ -46,7 +46,21 @@ class MigrateStatusCommand extends StatusCommand
                 }
             }
 
-        } else parent::fire();
+        } else {
+            $this->migrator->setConnection($manager->systemConnectionName);
+
+            if (! $this->migrator->repositoryExists()) {
+                return $this->error('No migrations found for system database.');
+            }
+
+            $ran = $this->migrator->getRepository()->getRan();
+
+            if (count($migrations = $this->getStatusFor($ran)) > 0) {
+                $this->table(['Ran?', 'Migration'], $migrations);
+            } else {
+                $this->error('No migrations found for system database.');
+            }
+        }
     }
 
     /**
@@ -58,9 +72,9 @@ class MigrateStatusCommand extends StatusCommand
     {
         $paths = $this->getMigrationPaths();
         if ($this->input->getOption('tenant')) {
-            $paths = array_map(function ($path){
-                return $path .= DIRECTORY_SEPARATOR.'tenant';
-            }, $paths);
+            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'tenant';
+        } else {
+            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'system';
         }
         return $this->migrator->getMigrationFiles($paths);
     }
