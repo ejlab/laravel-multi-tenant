@@ -2,9 +2,11 @@
 
 namespace EJLab\Laravel\MultiTenant\Middleware;
 
-use Closure;
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
+
+use Closure;
+use DB;
 
 class HandleTenantConnection
 {
@@ -23,6 +25,7 @@ class HandleTenantConnection
             if ($tenant) {
                 $manager = new DatabaseManager();
                 $manager->setConnection($tenant);
+                DB::setDefaultConnection($manager->tenantConnectionName);
                 
                 return $next($request);
             }
