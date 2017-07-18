@@ -8,5 +8,8 @@ class Tenant extends Model
 {
     protected $connection = 'system';
     protected $guarded = [];
-    protected $casts = ['configs' => 'json'];
+    protected $casts = [
+        'configs' => 'json',
+        'setup_has_done' => 'boolean'
+    ];
 }
