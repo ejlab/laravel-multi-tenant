@@ -40,8 +40,8 @@ class TenantDestroyCommand extends Command
     public function handle()
     {
         $domain = $this->input->getOption('domain') ?: 'all';
-        if ($domain == 'all') $tenants = Tenant::where('setup_has_done', TRUE)->get();
-        else $tenants = Tenant::where('domain', $domain)->get();
+        if ($domain == 'all') $tenants = Tenant::onlyTrashed()->where('setup_has_done', TRUE)->get();
+        else $tenants = Tenant::onlyTrashed()->where('domain', $domain)->get();
 
         $drawBar = (count($tenants) > 1);
         if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
