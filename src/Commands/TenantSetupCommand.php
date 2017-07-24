@@ -60,7 +60,8 @@ class TenantSetupCommand extends Command
             if ($this->input->getOption('migrate')) {
                 $this->call('migrate', [
                     '--tenant' => TRUE,
-                    '--domain' => $tenant->domain
+                    '--domain' => $tenant->domain,
+                    '--force' => TRUE
                 ]);
             }
 
