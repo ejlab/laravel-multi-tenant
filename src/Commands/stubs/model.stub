@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class DummyClass extends Model
 {
     protected $connection = 'DummyConnectionName';
-    //
+    protected $table = '';
+    protected $primaryKey = '';
+    protected $guarded = [];
+    public $incrementing = false;
+    public $timestamps = false;
+
+    protected $maps = [];
+    protected $hidden = [];
+    protected $appends = [];
 }
