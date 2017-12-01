@@ -14,7 +14,9 @@ class MigrateCommand extends BaseMigrateCommand
      *
      * @var string
      */
-    protected $signature = "migrate {--force : Force the operation to run when in production.}
+    protected $signature = "migrate {--database= : The database connection to use.}
+                {--force : Force the operation to run when in production.}
+                {--path= : The path of migrations files to be executed.}
                 {--pretend : Dump the SQL queries that would be run.}
                 {--seed : Indicates if the seed task should be re-run.}
                 {--step : Force the migrations to be run so they can be rolled back individually.}
@@ -26,7 +28,7 @@ class MigrateCommand extends BaseMigrateCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) return;
 

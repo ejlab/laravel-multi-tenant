@@ -15,7 +15,7 @@ class MigrateInstallCommand extends InstallCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $manager = new DatabaseManager();
         DB::setDefaultConnection($manager->systemConnectionName);

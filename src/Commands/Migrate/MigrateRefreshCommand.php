@@ -17,7 +17,7 @@ class MigrateRefreshCommand extends RefreshCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) return;
 

@@ -16,7 +16,7 @@ class MigrateStatusCommand extends StatusCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $manager = new DatabaseManager();
 
