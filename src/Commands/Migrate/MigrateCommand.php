@@ -54,7 +54,7 @@ class MigrateCommand extends BaseMigrateCommand
                 $this->migrator->setConnection($manager->tenantConnectionName);
 
                 $this->info('');
-                $this->info("Migrating for '{$tenant->name}'...");
+                $this->info("Migrating for '{$tenant->domain}'...");
 
                 if (! $this->migrator->repositoryExists()) {
                     $this->call('migrate:install', ['--tenant' => TRUE, '--domain' => $tenant->domain]);
@@ -84,7 +84,7 @@ class MigrateCommand extends BaseMigrateCommand
                 }
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."'{$tenant->name}' migrated.");
+                $this->info(($drawBar?'  ':'')."'{$tenant->domain}' migrated.");
             }
             
         } else {

@@ -36,7 +36,7 @@ class MigrateRefreshCommand extends RefreshCommand
             foreach ($tenants as $tenant) {
 
                 $this->info('');
-                $this->info("Refreshing migrations for '{$tenant->name}'...");
+                $this->info("Refreshing migrations for '{$tenant->domain}'...");
                 
                 $manager->setConnection($tenant);
 
@@ -71,7 +71,7 @@ class MigrateRefreshCommand extends RefreshCommand
                 }
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Migrations for '{$tenant->name}' refreshed.");
+                $this->info(($drawBar?'  ':'')."Migrations for '{$tenant->domain}' refreshed.");
             }
 
             if ($drawBar) $bar->finish();

@@ -43,11 +43,11 @@ class MigrateRollbackCommand extends RollbackCommand
                 $this->migrator->setConnection($manager->tenantConnectionName);
 
                 $this->info('');
-                $this->info("Rolling back '{$tenant->name}'...");
+                $this->info("Rolling back '{$tenant->domain}'...");
 
                 if (! $this->migrator->repositoryExists()) {
                     if ($drawBar) $bar->advance();
-                    $this->error(($drawBar?'  ':'')."No migrations found for '{$tenant->name}'.");
+                    $this->error(($drawBar?'  ':'')."No migrations found for '{$tenant->domain}'.");
                     continue;
                 }
 
@@ -64,7 +64,7 @@ class MigrateRollbackCommand extends RollbackCommand
                 }
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Rollback for '{$tenant->name}' succeed.");
+                $this->info(($drawBar?'  ':'')."Rollback for '{$tenant->domain}' succeed.");
             }
             if ($drawBar) $bar->finish();
         } else {

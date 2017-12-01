@@ -5,6 +5,7 @@ namespace EJLab\Laravel\MultiTenant;
 use Config;
 use DB;
 use App\Models\System\Tenant;
+use App\Models\System\TenantInfo;
 use EJLab\Laravel\MultiTenant\Exceptions\TenantDatabaseException;
 
 class DatabaseManager 
@@ -36,10 +37,8 @@ class DatabaseManager
 
     protected function getTenantAdminConfig()
     {
-        $config = Config::get('database.connections.'.$this->systemConnectionName);
-        $config['host'] = $this->tenant->db_host;
-        $config['port'] = $this->tenant->db_port;
-        $config['database'] = '';
+        $config = Config::get('database.connections.'.$this->tenantAdminConnectionName);
+        $config['host'] = $this->tenant->host;
 
         return $config;
     }
@@ -56,12 +55,16 @@ class DatabaseManager
 
     protected function getTenantDatabaseUsername()
     {
-        return str_replace(' ', '_', strtolower(Config::get('app.name', 'elmt'))).'_'.$this->tenant->domain;
+        return $this->tenant->domain;
     }
 
     protected function getTenantDatabasePassword()
     {
-        return sha1($this->tenant->domain.$this->tenant->id.Config::get('elmt.key', 'elmt_secret_key'));
+        $tenantInfo = TenantInfo::select(DB::raw("Right(master.dbo.fn_varbintohexstr(HashBytes('MD5',도메인 + convert(varchar, DB비밀번호갱신일자,20))),29) + '!' AS db_password"))
+            ->where('domain', substr($this->tenant->domain, 2))
+            ->get()
+            ->first();
+        return $tenantInfo->db_password;
     }
 
     public function create()

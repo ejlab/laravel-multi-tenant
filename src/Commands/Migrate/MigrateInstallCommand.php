@@ -35,7 +35,7 @@ class MigrateInstallCommand extends InstallCommand
                 $this->repository->setSource($manager->tenantConnectionName);
                 $this->repository->createRepository();
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Migration for '{$tenant->name}' database created successfully.");
+                $this->info(($drawBar?'  ':'')."Migration for '{$tenant->domain}' database created successfully.");
             }
 
             if ($drawBar) $bar->finish();

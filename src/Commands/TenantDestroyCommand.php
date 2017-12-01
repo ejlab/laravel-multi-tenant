@@ -51,7 +51,7 @@ class TenantDestroyCommand extends Command
         foreach ($tenants as $tenant) {
 
             $this->info('');
-            $this->info("Deleting database and user for '{$tenant->name}'...");
+            $this->info("Deleting database and user for '{$tenant->domain}'...");
 
             $manager->setConnection($tenant);
             $manager->delete();
@@ -60,7 +60,7 @@ class TenantDestroyCommand extends Command
             $tenant->save();
 
             if ($drawBar) $bar->advance();
-            $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->name}' deleted successfully.");
+            $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->domain}' deleted successfully.");
         }
 
         if ($drawBar) $bar->finish();

@@ -36,7 +36,7 @@ class SeedCommand extends BaseCommand
             foreach ($tenants as $tenant) {
 
                 $this->info('');
-                $this->info("Seeding to '{$tenant->name}'...");
+                $this->info("Seeding to '{$tenant->domain}'...");
 
                 $manager->setConnection($tenant);
                 $this->resolver->setDefaultConnection($manager->tenantConnectionName);
@@ -46,7 +46,7 @@ class SeedCommand extends BaseCommand
                 });
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Seed '{$tenant->name}' succeed.");
+                $this->info(($drawBar?'  ':'')."Seed '{$tenant->domain}' succeed.");
             }
             if ($drawBar) $bar->finish();
 

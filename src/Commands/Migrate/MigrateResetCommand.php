@@ -43,11 +43,11 @@ class MigrateResetCommand extends ResetCommand
                 $this->migrator->setConnection($manager->tenantConnectionName);
 
                 $this->info('');
-                $this->info("Resetting migrations for '{$tenant->name}'...");
+                $this->info("Resetting migrations for '{$tenant->domain}'...");
 
                 if (! $this->migrator->repositoryExists()) {
                     if ($drawBar) $bar->advance();
-                    $this->error(($drawBar?'  ':'')."No migrations found for '{$tenant->name}'.");
+                    $this->error(($drawBar?'  ':'')."No migrations found for '{$tenant->domain}'.");
                     continue;
                 }
 
@@ -61,7 +61,7 @@ class MigrateResetCommand extends ResetCommand
                 }
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."'{$tenant->name}' reseted.");
+                $this->info(($drawBar?'  ':'')."'{$tenant->domain}' reseted.");
             }
             if ($drawBar) $bar->finish();
         } else {

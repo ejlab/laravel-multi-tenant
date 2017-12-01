@@ -33,16 +33,16 @@ class MigrateStatusCommand extends StatusCommand
                 $this->migrator->setConnection($manager->tenantConnectionName);
 
                 if (! $this->migrator->repositoryExists()) {
-                    $this->error("No migrations found for '{$tenant->name}'.");
+                    $this->error("No migrations found for '{$tenant->domain}'.");
                     continue;
                 }
 
                 $ran = $this->migrator->getRepository()->getRan();
 
                 if (count($migrations = $this->getStatusFor($ran)) > 0) {
-                    $this->table(['Ran?', "Migration for '{$tenant->name}'"], $migrations);
+                    $this->table(['Ran?', "Migration for '{$tenant->domain}'"], $migrations);
                 } else {
-                    $this->error("No migrations found for '{$tenant->name}'.");
+                    $this->error("No migrations found for '{$tenant->domain}'.");
                 }
             }
 

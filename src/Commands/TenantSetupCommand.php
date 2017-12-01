@@ -52,7 +52,7 @@ class TenantSetupCommand extends Command
         foreach ($tenants as $tenant) {
 
             $this->info('');
-            $this->info("Setting up database for '{$tenant->name}'...");
+            $this->info("Setting up database for '{$tenant->domain}'...");
 
             $manager->setConnection($tenant);
             $manager->create();
@@ -69,7 +69,7 @@ class TenantSetupCommand extends Command
             $tenant->save();
 
             if ($drawBar) $bar->advance();
-            $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->name}' created successfully.");
+            $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->domain}' created successfully.");
         }
 
         if ($drawBar) $bar->finish();
