@@ -30,6 +30,8 @@ class DatabaseManager
         DB::purge($this->tenantConnectionName);
         Config::set('database.connections.'.$this->tenantAdminConnectionName, $this->getTenantAdminConfig());
         Config::set('database.connections.'.$this->tenantConnectionName, $this->getTenantConfig());
+        DB::reconnect($this->tenantAdminConnectionName);
+        DB::reconnect($this->tenantConnectionName);
     }
 
     protected function getTenantAdminConfig()
