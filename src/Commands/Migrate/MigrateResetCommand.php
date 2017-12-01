@@ -17,7 +17,7 @@ class MigrateResetCommand extends ResetCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) return;
 
