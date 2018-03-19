@@ -4,10 +4,15 @@ namespace EJLab\Laravel\MultiTenant\Commands;
 
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
+use EJLab\Laravel\MultiTenant\Commands\Migrate\TenantCommand;
 use Illuminate\Console\Command;
 
 class TenantDestroyCommand extends Command
 {
+    use TenantCommand;
+
+    protected $manager;
+
     /**
      * The name and signature of the console command.
      *
@@ -30,6 +35,7 @@ class TenantDestroyCommand extends Command
     public function __construct()
     {
         parent::__construct();
+        $this->manager = new DatabaseManager();
     }
 
     /**
@@ -39,30 +45,21 @@ class TenantDestroyCommand extends Command
      */
     public function handle()
     {
-        $domain = $this->input->getOption('domain') ?: 'all';
-        if ($domain == 'all') $tenants = Tenant::onlyTrashed()->where('setup_has_done', TRUE)->get();
-        else $tenants = Tenant::onlyTrashed()->where('domain', $domain)->get();
+        $tenants = $this->getTenants();
 
-        $drawBar = (count($tenants) > 1);
-        if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
-
-        $manager = new DatabaseManager();
+        $progressBar = $this->output->createProgressBar(count($tenants));
 
         foreach ($tenants as $tenant) {
-
-            $this->info('');
             $this->info("Deleting database and user for '{$tenant->name}'...");
 
-            $manager->setConnection($tenant);
-            $manager->delete();
+            $this->manager->setConnection($tenant);
+            $this->manager->delete();
 
             $tenant->setup_has_done = FALSE;
             $tenant->save();
 
-            if ($drawBar) $bar->advance();
-            $this->info(($drawBar?'  ':'')."Database and user for '{$tenant->name}' deleted successfully.");
+            $progressBar->advance();
+            $this->info("  Database and user for '{$tenant->name}' deleted successfully.");
         }
-
-        if ($drawBar) $bar->finish();
     }
 }
