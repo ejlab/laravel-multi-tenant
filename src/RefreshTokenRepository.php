@@ -10,4 +10,16 @@ class RefreshTokenRepository extends BaseRepository
         $this->database = app()->make('db');
         parent::persistNewRefreshToken($refreshTokenEntity);
     }
+    
+    public function revokeRefreshToken($tokenId)
+    {
+        $this->database = app()->make('db');
+        parent::revokeRefreshToken($tokenId);
+    }
+    
+    public function isRefreshTokenRevoked($tokenId)
+    {
+        $this->database = app()->make('db');
+        return parent::isRefreshTokenRevoked($tokenId);
+    }
 }

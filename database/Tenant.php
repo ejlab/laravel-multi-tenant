@@ -12,4 +12,9 @@ class Tenant extends Model
         'configs' => 'json',
         'setup_has_done' => 'boolean'
     ];
+
+    public static function getTableName()
+    {
+        return with(new static)->getTable();
+    }
 }

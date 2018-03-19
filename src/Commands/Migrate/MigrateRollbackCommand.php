@@ -4,14 +4,28 @@ namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
-use DB;
-use Illuminate\Console\ConfirmableTrait;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+use DB;
+
 class MigrateRollbackCommand extends RollbackCommand
 {
+    use TenantCommand;
+    
+    /**
+     * Create a new migration rollback command instance.
+     *
+     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
+     * @return void
+     */
+    public function __construct(\Illuminate\Database\Migrations\Migrator $migrator)
+    {
+        parent::__construct($migrator);
+
+        $this->manager = new DatabaseManager();
+    }
+
     /**
      * Execute the console command.
      *
@@ -19,70 +33,21 @@ class MigrateRollbackCommand extends RollbackCommand
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) return;
+        DB::setDefaultConnection($this->manager->systemConnectionName);
 
-        $manager = new DatabaseManager();
-        DB::setDefaultConnection($manager->systemConnectionName);
-
-        $paths = $this->getMigrationPaths();
-
-        if ($this->input->getOption('tenant')) {
-
-            $domain = $this->input->getOption('domain') ?: 'all';
-            if ($domain == 'all') $tenants = Tenant::all();
-            else $tenants = Tenant::where('domain', $domain)->get();
-
-            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'tenant';
-
-            $drawBar = (count($tenants) > 1);
-            if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
-
+        if ($this->option('tenant')) {
+            $tenants = $this->getTenants();
+            $progressBar = $this->output->createProgressBar(count($tenants));
+            $this->setTenantDatabase();
             foreach ($tenants as $tenant) {
-                
-                $manager->setConnection($tenant);
-                $this->migrator->setConnection($manager->tenantConnectionName);
-
-                $this->info('');
+                $this->manager->setConnection($tenant);
                 $this->info("Rolling back '{$tenant->name}'...");
-
-                if (! $this->migrator->repositoryExists()) {
-                    if ($drawBar) $bar->advance();
-                    $this->error(($drawBar?'  ':'')."No migrations found for '{$tenant->name}'.");
-                    continue;
-                }
-
-                $this->migrator->rollback($paths, [
-                    'pretend' => $this->option('pretend'),
-                    'step' => (int) $this->option('step'),
-                ]);
-                
-                // Once the migrator has run we will grab the note output and send it out to
-                // the console screen, since the migrator itself functions without having
-                // any instances of the OutputInterface contract passed into the class.
-                foreach ($this->migrator->getNotes() as $note) {
-                    $this->output->writeln($note);
-                }
-
-                if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Rollback for '{$tenant->name}' succeed.");
+                $progressBar->advance();
+                parent::handle();
             }
-            if ($drawBar) $bar->finish();
         } else {
-            $this->migrator->setConnection($manager->systemConnectionName);
-
-            foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.'system';
-
-            $this->migrator->rollback($paths, [
-                'pretend' => $this->option('pretend'),
-                'step' => (int) $this->option('step'),
-            ]);
-
-            // Once the migrator has run we will grab the note output and send it out to
-            // the console screen, since the migrator itself functions without having
-            // any instances of the OutputInterface contract passed into the class.
-            foreach ($this->migrator->getNotes() as $note) {
-                $this->output->writeln($note);
-            }
+            $this->setSystemDatabase();
+            parent::handle();
         }
     }
 
@@ -93,12 +58,9 @@ class MigrateRollbackCommand extends RollbackCommand
      */
     protected function getOptions()
     {
-        return [
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
-            ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
-            ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted.'],
+        return array_merge([
             ['tenant', 'T', InputOption::VALUE_NONE, "Rollback the last database migration for tenant database."],
             ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
-        ];
+        ], parent::getOptions());
     }
 }

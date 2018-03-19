@@ -3,13 +3,29 @@
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
 use App\Models\System\Tenant;
-use DB;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+use DB;
+
 class MigrateInstallCommand extends InstallCommand
 {
+    use TenantCommand;
+
+    /**
+     * Create a new migration install command instance.
+     *
+     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
+     * @return void
+     */
+    public function __construct(\Illuminate\Database\Migrations\MigrationRepositoryInterface $repository)
+    {
+        parent::__construct($repository);
+
+        $this->manager = new DatabaseManager();
+    }
+
     /**
      * Execute the console command.
      *
@@ -17,40 +33,34 @@ class MigrateInstallCommand extends InstallCommand
      */
     public function handle()
     {
-        $manager = new DatabaseManager();
-        DB::setDefaultConnection($manager->systemConnectionName);
+        DB::setDefaultConnection($this->manager->systemConnectionName);
         
-        if ($this->input->getOption('tenant')) {
-
-            $domain = $this->input->getOption('domain') ?: 'all';
-            if ($domain == 'all') $tenants = Tenant::all();
-            else $tenants = Tenant::where('domain', $domain)->get();
-
-            $drawBar = (count($tenants) > 1);
-
-            if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
-
+        if ($this->option('tenant')) {
+            $tenants = $this->getTenants();
+            $progressBar = $this->output->createProgressBar(count($tenants));
+            $this->setTenantDatabase();
             foreach ($tenants as $tenant) {
-                $manager->setConnection($tenant);
-                $this->repository->setSource($manager->tenantConnectionName);
-                $this->repository->createRepository();
-                if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Migration for '{$tenant->name}' database created successfully.");
+                $this->manager->setConnection($tenant);
+                $this->info("Creating migration table for '{$tenant->name}' database...");
+                $progressBar->advance();
+                parent::handle();
             }
-
-            if ($drawBar) $bar->finish();
-
         } else {
-            $this->repository->createRepository();
-            $this->info('Migration table for system database created successfully.');
+            $this->setSystemDatabase();
+            parent::handle();
         }
     }
 
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
     protected function getOptions()
     {
-        return [
+        return array_merge([
             ['tenant', 'T', InputOption::VALUE_NONE, "Create the migration repository for tenant database."],
-            ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."]
-        ];
+            ['domain', NULL, InputOption::VALUE_OPTIONAL, "The domain for tenant. 'all' or null value for all tenants."],
+        ], parent::getOptions());
     }
 }
