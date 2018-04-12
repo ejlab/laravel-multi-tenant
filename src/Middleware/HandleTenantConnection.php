@@ -21,7 +21,7 @@ class HandleTenantConnection
     {
         $parameters = $request->route()->parameters();
         if (isset($parameters['domain'])) {
-            $tenant = Tenant::where('domain', $parameters['domain'])->get()->first();
+            $tenant = Tenant::where('domain', 'c_'.$parameters['domain'])->get()->first();
             if ($tenant) {
                 $manager = new DatabaseManager();
                 $manager->setConnection($tenant);
