@@ -13,15 +13,9 @@ class MigrateMakeCommand extends \Illuminate\Database\Console\Migrations\Migrate
         {--create= : The table to be created.}
         {--table= : The table to migrate.}
         {--path= : The location where the migration file should be created.}
+        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths.}
         {--S|system : Create migration for system database. }
         {--T|tenant : Create migration for tenant databases. }';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Create a new migration file for database';
 
     protected function getMigrationPath()
     {
