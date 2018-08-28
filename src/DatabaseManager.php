@@ -78,7 +78,7 @@ class DatabaseManager
             return DB::connection($this->tenantAdminConnectionName)->transaction(function () use ($config) {
                 $result = false;
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
-                    "CREATE USER IF NOT EXISTS `{$config['username']}`@'{$config['host']}' IDENTIFIED BY '{$config['password']}';"
+                    "CREATE USER IF NOT EXISTS `{$config['username']}`@'%' IDENTIFIED BY '{$config['password']}';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not create user '{$config['username']}'");
     
@@ -88,7 +88,7 @@ class DatabaseManager
                 if (!$result) throw new TenantDatabaseException("Could not create database '{$config['database']}'");
     
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
-                    "GRANT ALL ON `{$config['database']}`.* TO `{$config['username']}`@'{$config['host']}';"
+                    "GRANT ALL ON `{$config['database']}`.* TO `{$config['username']}`@'%';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not grant privileges to user '{$config['username']}' for '{$config['database']}'");
     
@@ -107,7 +107,7 @@ class DatabaseManager
             return DB::connection($this->tenantAdminConnectionName)->transaction(function () use ($config) {
                 $result = false;
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
-                    "REVOKE ALL ON `{$config['database']}`.* FROM `{$config['username']}`@'{$config['host']}';"
+                    "REVOKE ALL ON `{$config['database']}`.* FROM `{$config['username']}`@'%';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not revoke privileges from user '{$config['username']}' for '{$config['database']}'");
 
@@ -117,7 +117,7 @@ class DatabaseManager
                 if (!$result) throw new TenantDatabaseException("Could not drop database '{$config['database']}'");
 
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
-                    "DROP USER IF EXISTS `{$config['username']}`@'{$config['host']}';"
+                    "DROP USER IF EXISTS `{$config['username']}`@'%';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not drop user '{$config['username']}'");
 
