@@ -40,51 +40,49 @@ class MultiTenantServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                TenantSetupCommand::class,
-                TenantDestroyCommand::class,
-            ]);
+        $this->commands([
+            TenantSetupCommand::class,
+            TenantDestroyCommand::class,
+        ]);
 
-            $this->app->extend('command.migrate', function ($object, $app) {
-                return new MigrateCommand($app['migrator']);
-            });
+        $this->app->extend('command.migrate', function ($object, $app) {
+            return new MigrateCommand($app['migrator']);
+        });
 
-            $this->app->extend('command.migrate.install', function ($object, $app) {
-                return new MigrateInstallCommand($app['migration.repository']);
-            });
-            
-            $this->app->extend('command.migrate.make', function ($object, $app) {
-                return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
-            });
+        $this->app->extend('command.migrate.install', function ($object, $app) {
+            return new MigrateInstallCommand($app['migration.repository']);
+        });
+        
+        $this->app->extend('command.migrate.make', function ($object, $app) {
+            return new MigrateMakeCommand($app['migration.creator'], $app['composer']);
+        });
 
-            $this->app->extend('command.migrate.refresh', function ($object, $app) {
-                return new MigrateRefreshCommand;
-            });
+        $this->app->extend('command.migrate.refresh', function ($object, $app) {
+            return new MigrateRefreshCommand;
+        });
 
-            $this->app->extend('command.migrate.reset', function ($object, $app) {
-                return new MigrateResetCommand($app['migrator']);
-            });
+        $this->app->extend('command.migrate.reset', function ($object, $app) {
+            return new MigrateResetCommand($app['migrator']);
+        });
 
-            $this->app->extend('command.migrate.rollback', function ($object, $app) {
-                return new MigrateRollbackCommand($app['migrator']);
-            });
+        $this->app->extend('command.migrate.rollback', function ($object, $app) {
+            return new MigrateRollbackCommand($app['migrator']);
+        });
 
-            $this->app->extend('command.migrate.status', function ($object, $app) {
-                return new MigrateStatusCommand($app['migrator']);
-            });
+        $this->app->extend('command.migrate.status', function ($object, $app) {
+            return new MigrateStatusCommand($app['migrator']);
+        });
 
-            $this->app->extend('command.seed', function ($object, $app) {
-                return new SeedCommand($app['db']);
-            });
+        $this->app->extend('command.seed', function ($object, $app) {
+            return new SeedCommand($app['db']);
+        });
 
-            $this->app->extend('command.seeder.make', function ($object, $app) {
-                return new SeederMakeCommand($app['files'], $app['composer']);
-            });
+        $this->app->extend('command.seeder.make', function ($object, $app) {
+            return new SeederMakeCommand($app['files'], $app['composer']);
+        });
 
-            $this->app->extend('command.model.make', function ($object, $app) {
-                return new ModelMakeCommand($app['files']);
-            });
-        }
+        $this->app->extend('command.model.make', function ($object, $app) {
+            return new ModelMakeCommand($app['files']);
+        });
     }
 }
