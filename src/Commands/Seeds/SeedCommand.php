@@ -2,12 +2,16 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Seeds;
 
+use App\Models\System\Tenant;
+use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Console\Command;
 use Illuminate\Database\Console\Seeds\SeedCommand as BaseCommand;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+
+use DB;
 
 class SeedCommand extends BaseCommand
 {
@@ -16,7 +20,7 @@ class SeedCommand extends BaseCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) return;
 
