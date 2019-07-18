@@ -112,11 +112,10 @@ class MigrateRefreshCommand extends RefreshCommand
      * @param  bool  $force
      * @return void
      */
-    protected function runRollback($domain, $path, $step, $force)
+    protected function runRollback($domain, $path, $step)
     {
         $options = [
             '--step' => $step,
-            '--force' => $force,
         ];
         if ($this->input->getOption('tenant')) {
             $options['--tenant'] = TRUE;
@@ -132,9 +131,9 @@ class MigrateRefreshCommand extends RefreshCommand
      * @param  bool  $force
      * @return void
      */
-    protected function runReset($domain, $path, $force)
+    protected function runReset($domain, $path)
     {
-        $options = ['--force' => $force];
+        $options = [];
         if ($this->input->getOption('tenant')) {
             $options['--tenant'] = TRUE;
             $options['--domain'] = $domain;
