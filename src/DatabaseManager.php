@@ -7,7 +7,7 @@ use DB;
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\Exceptions\TenantDatabaseException;
 
-class DatabaseManager 
+class DatabaseManager
 {
     public $systemConnectionName;
     public $tenantConnectionName;
@@ -60,12 +60,20 @@ class DatabaseManager
 
     protected function getTenantDatabaseUsername()
     {
-        return str_replace(' ', '_', strtolower(Config::get('app.name', 'elmt'))).'_'.$this->tenant->domain;
+        if (method_exists($this->tenant, 'getDatabaseName')) {
+            return $this->tenant->getDatabaseName();
+        } else {
+            return str_replace(' ', '_', strtolower(Config::get('app.name', 'elmt'))).'_'.$this->tenant->domain;
+        }
     }
 
     protected function getTenantDatabasePassword()
     {
-        return sha1($this->tenant->domain.$this->tenant->id.Config::get('elmt.key', 'elmt_secret_key'));
+        if (method_exists($this->tenant, 'getDatabasePassword')) {
+            return $this->tenant->getDatabasePassword();
+        } else {
+            return sha1($this->tenant->id.$this->tenant->domain.Config::get('elmt.key', Config::get('app.key')));
+        }
     }
 
     public function create()
@@ -81,17 +89,17 @@ class DatabaseManager
                     "CREATE USER IF NOT EXISTS `{$config['username']}`@'%' IDENTIFIED BY '{$config['password']}';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not create user '{$config['username']}'");
-    
+
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
                     "CREATE DATABASE IF NOT EXISTS `{$config['database']}`;"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not create database '{$config['database']}'");
-    
+
                 $result = DB::connection($this->tenantAdminConnectionName)->statement(
                     "GRANT ALL ON `{$config['database']}`.* TO `{$config['username']}`@'%';"
                 );
                 if (!$result) throw new TenantDatabaseException("Could not grant privileges to user '{$config['username']}' for '{$config['database']}'");
-    
+
                 return true;
             });
         }
