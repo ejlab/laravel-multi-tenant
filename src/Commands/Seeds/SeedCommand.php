@@ -4,12 +4,9 @@ namespace EJLab\Laravel\MultiTenant\Commands\Seeds;
 
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
-use Illuminate\Console\Command;
 use Illuminate\Database\Console\Seeds\SeedCommand as BaseCommand;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 use DB;
 
@@ -22,8 +19,7 @@ class SeedCommand extends BaseCommand
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) return;
-
+        if (!$this->confirmToProceed()) return;
         $manager = new DatabaseManager();
         DB::setDefaultConnection($manager->systemConnectionName);
 
@@ -38,7 +34,6 @@ class SeedCommand extends BaseCommand
             if ($drawBar) $bar = $this->output->createProgressBar(count($tenants));
 
             foreach ($tenants as $tenant) {
-
                 $this->info('');
                 $this->info("Seeding to '{$tenant->name}'...");
 
@@ -50,7 +45,7 @@ class SeedCommand extends BaseCommand
                 });
 
                 if ($drawBar) $bar->advance();
-                $this->info(($drawBar?'  ':'')."Seed '{$tenant->name}' succeed.");
+                $this->info(($drawBar ? '  ' : '') . "Seed '{$tenant->name}' succeed.");
             }
             if ($drawBar) $bar->finish();
 
@@ -76,7 +71,7 @@ class SeedCommand extends BaseCommand
 
         return $class->setContainer($this->laravel)->setCommand($this);
     }
-
+    
     /**
      * Get the console command options.
      *
