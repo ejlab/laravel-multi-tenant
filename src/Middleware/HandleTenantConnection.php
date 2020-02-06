@@ -20,8 +20,8 @@ class HandleTenantConnection
     public function handle($request, Closure $next)
     {
         $parameters = $request->route()->parameters();
-        if (isset($parameters['domain'])) {
-            $tenant = Tenant::where('domain', $parameters['domain'])->get()->first();
+        if (isset($parameters[config('elmt.tenant-id-parameter', 'domain')])) {
+            $tenant = Tenant::where(config('elmt.tenant-id-column', 'domain'), $parameters[config('elmt.tenant-id-parameter', 'domain')])->get()->first();
             if ($tenant) {
                 $manager = new DatabaseManager();
                 $manager->setConnection($tenant);
