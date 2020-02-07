@@ -4,7 +4,6 @@ namespace EJLab\Laravel\MultiTenant\Commands;
 
 use Config;
 use Illuminate\Support\Str;
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand as BaseCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -17,7 +16,11 @@ class ModelMakeCommand extends BaseCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+
+        if ($this->option('pivot')) {
+            $table = Str::singular($table);
+        }
 
         $args = [
             'name' => "create_{$table}_table",
@@ -25,7 +28,7 @@ class ModelMakeCommand extends BaseCommand
         ];
 
         if ($this->input->getOption('tenant')) $args['--tenant'] = TRUE;
-        if ($this->input->getOption('system')) $args['--system'] = TRUE;
+        elseif ($this->input->getOption('system')) $args['--system'] = TRUE;
 
         $this->call('make:migration', $args);
     }
@@ -68,7 +71,7 @@ class ModelMakeCommand extends BaseCommand
         
         $connection = '';
         if ($this->input->getOption('system')) $connection = Config::get('elmt.system-connection', 'system');
-        if ($this->input->getOption('tenant')) $connection = Config::get('elmt.tenant-connection', 'tenant');
+        elseif ($this->input->getOption('tenant')) $connection = Config::get('elmt.tenant-connection', 'tenant');
 
         return $this->replaceConnection($stub, $connection)->replaceNamespace($stub, $name)->replaceClass($stub, $name);
     }

@@ -2,10 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Console\Migrations\StatusCommand;
 use Symfony\Component\Console\Input\InputOption;
 

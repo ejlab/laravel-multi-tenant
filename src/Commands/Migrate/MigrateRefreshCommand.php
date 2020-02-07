@@ -2,10 +2,7 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
-use Illuminate\Console\Command;
-use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -39,10 +36,7 @@ class MigrateRefreshCommand extends RefreshCommand
                 
                 $domain = $tenant->domain;
 
-                // Next we'll gather some of the options so that we can have the right options
-                // to pass to the commands. This includes options such as which database to
-                // use and the path to use for the migration. Then we'll run the command.
-                $force = $this->input->getOption('force');
+                $path = $this->input->getOption('path');
 
                 // If the "step" option is specified it means we only want to rollback a small
                 // number of migrations before migrating again. For example, the user might
@@ -53,14 +47,18 @@ class MigrateRefreshCommand extends RefreshCommand
                     $this->call('migrate:rollback', [
                         '--tenant' => TRUE,
                         '--domain' => $domain,
+                        '--path' => $path,
+                        '--realpath' => $this->input->getOption('realpath'),
                         '--step' => $step,
-                        '--force' => $force,
+                        '--force' => true,
                     ]);
                 } else {
                     $this->call('migrate:reset', [
                         '--tenant' => TRUE,
                         '--domain' => $domain,
-                        '--force' => $force,
+                        '--path' => $path,
+                        '--realpath' => $this->input->getOption('realpath'),
+                        '--force' => true,
                     ]);
                 }
 
@@ -70,7 +68,9 @@ class MigrateRefreshCommand extends RefreshCommand
                 $this->call('migrate', [
                     '--tenant' => TRUE,
                     '--domain' => $domain,
-                    '--force' => $force,
+                    '--path' => $path,
+                    '--realpath' => $this->input->getOption('realpath'),
+                    '--force' => true,
                 ]);
 
                 if ($this->needsSeeding()) {

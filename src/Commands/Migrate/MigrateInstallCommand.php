@@ -2,7 +2,6 @@
 
 namespace EJLab\Laravel\MultiTenant\Commands\Migrate;
 
-use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Symfony\Component\Console\Input\InputOption;
