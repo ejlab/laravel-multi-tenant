@@ -47,8 +47,8 @@ class DatabaseManager
     protected function getTenantConfig()
     {
         $config = $this->getTenantAdminConfig();
-        $config['database'] = $this->getTenantDatabaseUsername();
-        $config['username'] = $config['database'];
+        $config['database'] = $this->getTenantDatabaseName();
+        $config['username'] = $this->getTenantDatabaseUsername();
         $config['password'] = $this->getTenantDatabasePassword();
 
         if ($config['driver'] == 'sqlite') {
@@ -58,10 +58,19 @@ class DatabaseManager
         return $config;
     }
 
-    protected function getTenantDatabaseUsername()
+    protected function getTenantDatabaseName()
     {
         if (method_exists($this->tenant, 'getDatabaseName')) {
             return $this->tenant->getDatabaseName();
+        } else {
+            return str_replace(' ', '_', strtolower(Config::get('app.name', 'elmt'))).'_'.$this->tenant->domain;
+        }
+    }
+
+    protected function getTenantDatabaseUsername()
+    {
+        if (method_exists($this->tenant, 'getDatabaseUsername')) {
+            return $this->tenant->getDatabaseUsername();
         } else {
             return str_replace(' ', '_', strtolower(Config::get('app.name', 'elmt'))).'_'.$this->tenant->domain;
         }
