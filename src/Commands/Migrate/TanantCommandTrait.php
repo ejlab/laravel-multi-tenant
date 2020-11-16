@@ -14,13 +14,12 @@ trait TenantCommand
 {
     protected $manager;
 
-    protected function getTenants($setup = TRUE)
-    {
+    protected function getTenants($setup = TRUE) {
         DB::setDefaultConnection($this->manager->systemConnectionName);
-
+        
         if (Schema::hasTable(Tenant::getTableName())) {
             $qb = Tenant::where('setup_has_done', $setup);
-            if ($this->option('domain')) $qb->where(config('elmt.tenant-id-column', 'domain'), $this->option('domain'));
+            if ($this->option('domain')) $qb->where('domain', $this->option('domain'));
             $tenants = $qb->get();
 
             if (count($tenants) == 0) {
@@ -34,13 +33,11 @@ trait TenantCommand
         }
     }
 
-    protected function setSystemDatabase()
-    {
+    protected function setSystemDatabase() {
         $this->input->setOption('database', $this->manager->systemConnectionName);
     }
 
-    protected function setTenantDatabase()
-    {
+    protected function setTenantDatabase() {
         $this->input->setOption('database', $this->manager->tenantConnectionName);
     }
 
@@ -53,7 +50,7 @@ trait TenantCommand
     {
         $type = $this->option('tenant') ? 'tenant' : 'system';
         $paths = parent::getMigrationPaths();
-        foreach ($paths as $path) $paths[] = $path . DIRECTORY_SEPARATOR . $type;
+        foreach ($paths as $path) $paths[] = $path.DIRECTORY_SEPARATOR.$type;
 
         return $paths;
     }
