@@ -10,7 +10,7 @@ use DB;
 
 class MigrateRollbackCommand extends RollbackCommand
 {
-    use TenantCommand;
+    use TenantCommandTrait;
     
     /**
      * Create a new migration rollback command instance.

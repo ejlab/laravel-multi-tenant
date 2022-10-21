@@ -10,7 +10,7 @@ use DB;
 /**
  * 
  */
-trait TenantCommand
+trait TenantCommandTrait
 {
     protected $manager;
 

@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MigrateStatusCommand extends StatusCommand
 {
-    use TenantCommand;
+    use TenantCommandTrait;
 
     /**
      * Create a new migration rollback command instance.

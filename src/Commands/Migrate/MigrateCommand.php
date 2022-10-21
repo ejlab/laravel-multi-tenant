@@ -7,7 +7,7 @@ use Illuminate\Database\Console\Migrations\MigrateCommand as BaseMigrateCommand;
 
 class MigrateCommand extends BaseMigrateCommand
 {
-    use TenantCommand;
+    use TenantCommandTrait;
 
     /**
      * The name and signature of the console command.

@@ -4,12 +4,12 @@ namespace EJLab\Laravel\MultiTenant\Commands;
 
 use App\Models\System\Tenant;
 use EJLab\Laravel\MultiTenant\DatabaseManager;
-use EJLab\Laravel\MultiTenant\Commands\Migrate\TenantCommand;
+use EJLab\Laravel\MultiTenant\Commands\Migrate\TenantCommandTrait;
 use Illuminate\Console\Command;
 
 class TenantDestroyCommand extends Command
 {
-    use TenantCommand;
+    use TenantCommandTrait;
 
     protected $manager;
 

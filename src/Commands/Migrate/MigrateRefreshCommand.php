@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MigrateRefreshCommand extends RefreshCommand
 {
-    use TenantCommand;
+    use TenantCommandTrait;
 
     public function __construct()
     {

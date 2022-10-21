@@ -10,7 +10,7 @@ use DB;
 
 class MigrateInstallCommand extends InstallCommand
 {
-    use TenantCommand;
+    use TenantCommandTrait;
 
     /**
      * Create a new migration install command instance.
