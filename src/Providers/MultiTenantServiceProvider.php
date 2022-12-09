@@ -4,6 +4,7 @@ namespace EJLab\Laravel\MultiTenant\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use EJLab\Laravel\MultiTenant\Commands\SystemSetupCommand;
 use EJLab\Laravel\MultiTenant\Commands\TenantSetupCommand;
 use EJLab\Laravel\MultiTenant\Commands\TenantDestroyCommand;
 use EJLab\Laravel\MultiTenant\Commands\ModelMakeCommand;
@@ -43,6 +44,7 @@ class MultiTenantServiceProvider extends ServiceProvider
         $this->commands([
             TenantSetupCommand::class,
             TenantDestroyCommand::class,
+            SystemSetupCommand::class,
         ]);
 
         $this->app->extend('command.migrate', function ($object, $app) {

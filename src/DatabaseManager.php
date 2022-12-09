@@ -37,7 +37,11 @@ class DatabaseManager
     protected function getTenantAdminConfig()
     {
         $config = Config::get('database.connections.'.$this->systemConnectionName);
-        $config['host'] = $this->tenant->db_host;
+        if($this->tenant->db_host == "127.0.0.1"){
+            $config['host'] = "tenant-db";
+        }else{
+            $config['host'] = $this->tenant->db_host;
+        }
         $config['port'] = $this->tenant->db_port;
         $config['database'] = '';
 
