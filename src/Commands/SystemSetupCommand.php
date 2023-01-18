@@ -56,14 +56,14 @@ class SystemSetupCommand extends Command
         try {
             \Artisan::call("migrate:install --database=nuria_pos");
         } catch (\Exception $e) {
-            echo " 1.is already installed";
+            echo " 1.is already installed\n";
         }
 
         //system 테이블 생성
         try {
             \Artisan::call("migrate --database=nuria_pos --path=database/migrations/system");            
         } catch (\Exception $e) {
-            echo " 2.is already migrate";
+            echo " 2.is already migrate\n";
         }
 
         $company_count = DB::connection('master')->table('company')        
@@ -73,6 +73,7 @@ class SystemSetupCommand extends Command
         $company = new Company;
         $company->domain = "kwon";
         $company->testing = 0;
+        $company->api_key_date = '2017-08-30 11:26:06';
         $company->sellmate_domain = "kwon";
         $company->password = \DB::raw('sha1(1234)');        
         $company->db_host = \DB::raw("INET_ATON('127.0.0.1')");
@@ -93,27 +94,27 @@ class SystemSetupCommand extends Command
             }  
         } catch (\Exception  $e) {
             
-            echo " 3.tenant is already setup";
+            echo " 3.tenant is already setup\n";
         }
         
         try {
             \Artisan::call("migrate:install -T --domain=kwon");
             DB::connection('tenant_admin')->unprepared("ALTER USER 'kwon'@'%' IDENTIFIED WITH mysql_native_password BY '{$company->getDatabasePassword()}';");
         } catch (\Exception $e) {
-            echo " 4.tenant is already installed";
+            echo " 4.tenant is already installed\n";
         }
 
         try {
              \Artisan::call("migrate -T --path=database/migrations/tenant --domain=kwon --force");
         } catch (\Exception $e) {
-            echo " 5.tenant is already migrate";
+            echo " 5.tenant is already migrate\n";
         }
 
         //seeding check        
         $count = DB::connection('company')->table('product')                
         ->count();     
 
-        echo " 6.start seed";
+        echo " 6.start seed\n";
 
         if($count==0){
             //\Artisan::call("db:seed --force");
