@@ -1,6 +1,6 @@
 {
     "name": "ejlab/laravel-multi-tenant",
-    "version" : "0.2.17",
+    "version" : "0.2.19",
     "license": "MIT",
     "description": "Multi tenant package for Laravel Framework",
     "authors": [
