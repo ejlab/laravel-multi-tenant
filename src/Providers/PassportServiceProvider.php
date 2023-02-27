@@ -9,6 +9,7 @@ use Illuminate\Auth\RequestGuard;
 use League\OAuth2\Server\ResourceServer;
 use Laravel\Passport\TokenRepository;
 use Laravel\Passport\ClientRepository;
+use League\OAuth2\Server\Grant\RefreshTokenGrant;
 
 use Auth;
 
@@ -29,6 +30,19 @@ class PassportServiceProvider extends BaseProvider
         $grant->setRefreshTokenTTL(\Laravel\Passport\Passport::refreshTokensExpireIn());
 
         return $grant;
+    }
+    /**
+     * Create and configure a Refresh Token grant instance.
+     *
+     * @return \League\OAuth2\Server\Grant\RefreshTokenGrant
+     */
+    protected function makeRefreshTokenGrant()
+    {   
+        $repository = $this->app->make(RefreshTokenRepository::class);
+
+        return tap(new RefreshTokenGrant($repository), function ($grant) {
+            $grant->setRefreshTokenTTL(\Laravel\Passport\Passport::refreshTokensExpireIn());
+        });
     }
 
     /**
